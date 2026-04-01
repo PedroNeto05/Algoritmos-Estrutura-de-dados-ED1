@@ -31,7 +31,13 @@ func (l *LinkedList) Add(val int) {
 	l.inserted++
 }
 
-// func (l *LinkedList) AddOnIndex(val, index int) error {}
+func (l *LinkedList) AddOnIndex(val, index int) error {
+	if index >= l.inserted || index < 0 {
+		return errors.New("index fora do vetor")
+	}
+
+	return nil
+}
 
 func (l *LinkedList) Get(index int) (int, error) {
 	if l.inserted == 0 {
@@ -55,9 +61,6 @@ func (l *LinkedList) Get(index int) (int, error) {
 }
 
 func (l *LinkedList) Set(val, index int) error {
-	if l.inserted == 0 {
-		return errors.New("o vetor esta vazio")
-	}
 	if index >= l.inserted || index < 0 {
 		return errors.New("index fora do vetor")
 	}
