@@ -13,18 +13,10 @@ type LinkedList struct {
 	inserted int
 }
 
-func (l *LinkedList) Init() {
-}
-
 func (l *LinkedList) Add(val int) {
 	newNode := &Node{
 		val:  val,
 		next: nil,
-	}
-	if l.inserted == 0 {
-		l.head = newNode
-		l.tail = l.head
-		return
 	}
 
 	currNode := l.head
