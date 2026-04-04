@@ -5,7 +5,7 @@ import (
 )
 
 // factory
-func newList(t *testing.T, size int) IList {
+func newArrayList(t *testing.T, size int) *ArrayList {
 	t.Helper()
 
 	l := &ArrayList{}
@@ -15,9 +15,9 @@ func newList(t *testing.T, size int) IList {
 	return l
 }
 
-func TestIListImplementation(t *testing.T) {
+func TestArrayListImplementation(t *testing.T) {
 	t.Run("Add and Size", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 
 		l.Add(10)
 		l.Add(20)
@@ -28,7 +28,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Add Until Resize", func(t *testing.T) {
-		l := newList(t, 1)
+		l := newArrayList(t, 1)
 
 		for i := range 50 {
 			l.Add(i)
@@ -47,7 +47,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Get Valid and Invalid", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 		l.Add(100)
 
 		val, err := l.Get(0)
@@ -61,7 +61,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Set Valid", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 		l.Add(1)
 
 		if err := l.Set(99, 0); err != nil {
@@ -75,7 +75,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Set Invalid", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 		l.Add(1)
 
 		if err := l.Set(10, -1); err == nil {
@@ -88,7 +88,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("AddOnIndex Beginning", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 
 		l.Add(2)
 		l.Add(3)
@@ -104,7 +104,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("AddOnIndex Middle", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 
 		l.Add(1)
 		l.Add(3)
@@ -120,7 +120,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("AddOnIndex Invalid", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 		l.Add(1)
 
 		if err := l.AddOnIndex(10, -1); err == nil {
@@ -133,7 +133,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Delete Beginning", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 
 		l.Add(1)
 		l.Add(2)
@@ -149,7 +149,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Delete Middle", func(t *testing.T) {
-		l := newList(t, 3)
+		l := newArrayList(t, 3)
 
 		l.Add(1)
 		l.Add(2)
@@ -166,7 +166,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Delete End", func(t *testing.T) {
-		l := newList(t, 3)
+		l := newArrayList(t, 3)
 
 		l.Add(1)
 		l.Add(2)
@@ -182,7 +182,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Delete Invalid", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 		l.Add(1)
 
 		if err := l.RemoveOnIndex(-1); err == nil {
@@ -195,7 +195,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Delete Empty List", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 
 		if err := l.RemoveOnIndex(0); err == nil {
 			t.Error("Esperava erro ao deletar lista vazia")
@@ -203,7 +203,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Delete Until Empty", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 
 		l.Add(1)
 		l.Add(2)
@@ -222,7 +222,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Get Empty List", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 
 		if _, err := l.Get(0); err == nil {
 			t.Error("Esperava erro ao acessar lista vazia")
@@ -230,7 +230,7 @@ func TestIListImplementation(t *testing.T) {
 	})
 
 	t.Run("Stress Mixed Operations", func(t *testing.T) {
-		l := newList(t, 2)
+		l := newArrayList(t, 2)
 
 		for i := range 100 {
 			l.Add(i)
