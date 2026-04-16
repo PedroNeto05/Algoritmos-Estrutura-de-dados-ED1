@@ -88,13 +88,11 @@ func TestBuscaBinaria(t *testing.T) {
 	t.Run("Edge Case - Convergência de ponteiros (Array de 2 elementos)", func(t *testing.T) {
 		arrCurto := []int{10, 20}
 
-		// Se a condição for 'ini < fim', este teste falha retornando -1
 		idx10 := BuscaBinaria(arrCurto, 10, 0, len(arrCurto))
 		if idx10 != 0 {
 			t.Errorf("Esperado índice 0 para o valor 10, obtido %d", idx10)
 		}
 
-		// Garante que o outro elemento também é achado
 		idx20 := BuscaBinaria(arrCurto, 20, 0, len(arrCurto))
 		if idx20 != 1 {
 			t.Errorf("Esperado índice 1 para o valor 20, obtido %d", idx20)
