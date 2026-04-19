@@ -89,7 +89,7 @@ implementacao no arquivos:
 | Push(value int) | O(N)       | Omega(1)    | O(N)        | Omega(1)    |
 | Pop()           | O(1)       | Omega(1)    | O(N)        | Omega(1)    |
 | Peek(index int) | O(1)       | Omega(1)    | O(N)        | Omega(1)    |
-| Size(index int) | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| Size()          | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
 
 ### Questão 3
 
@@ -98,3 +98,67 @@ implementacao no arquivos:
 - detect_parenteses.go
 
 ### Questão 4
+
+C)
+
+## Filas
+
+### Questão 1
+
+- Fila de processos gerenciados pela CPU
+- Enfileramento de dados usando RabbitMQ
+
+### Questão 2
+
+implementacao no arquivos:
+
+- array_queue.go
+- linked_queue.go
+
+### Questão 3
+
+| Operação              | ArrayQueue |             | LinkedQueue |             |
+| --------------------- | ---------- | ----------- | ----------- | ----------- |
+|                       | Pior Caso  | Melhor Caso | Pior Caso   | Melhor Caso |
+| Enqueue(value int)    | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| Dequeue() (int,error) | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| Front() (int,error)   | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| Size()                | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+
+### Questão 4
+
+implementacao no arquivos:
+
+- size_func_queue.go
+
+## Deque
+
+### Questão 1
+
+- Pode ser usado para cache, dados mais antigos ficam em uma ponta, e dados mais novos em outra ponta
+- Janela dislizante
+
+### Questão 2
+
+implementacao no arquivos:
+
+- array_deque.go
+- linked_deque.go
+
+### Questão 3
+
+| Operação                   | ArrayDeque |             | LinkedDeque |             |
+| -------------------------- | ---------- | ----------- | ----------- | ----------- |
+|                            | Pior Caso  | Melhor Caso | Pior Caso   | Melhor Caso |
+| EnqueueFront(value int)    | O(N)       | Omega(1)    | O(1)        | Omega(1)    |
+| EnqueueRear(value int)     | O(N)       | Omega(1)    | O(1)        | Omega(1)    |
+| DequeueFront() (int,error) | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| DequeueRear() (int,error)  | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| Front() (int,error)        | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| Rear() (int,error)         | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| IsEmpty()                  | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+| Size()                     | O(1)       | Omega(1)    | O(1)        | Omega(1)    |
+
+## Algoritmo de Busca
+
+### Questão 1
