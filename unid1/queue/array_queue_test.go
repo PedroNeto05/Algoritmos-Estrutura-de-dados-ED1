@@ -217,4 +217,45 @@ func TestArrayQueueImplementation(t *testing.T) {
 			}
 		}
 	})
+	t.Run("SizeAlt Calculation", func(t *testing.T) {
+		// Inicializamos com 5
+		q := newArrayQueue(t, 5)
+
+		// 1. Fila Vazia
+		if got := q.SizeAlt(); got != 0 {
+			t.Errorf("Fila vazia: SizeAlt esperado 0, obtido %d", got)
+		}
+
+		// 2. Fila com 1 elemento
+		q.Enqueue(10)
+		if got := q.SizeAlt(); got != 1 {
+			t.Errorf("1 elemento: SizeAlt esperado 1, obtido %d", got)
+		}
+
+		// 3. Fila com múltiplos elementos (linear, sem dar a volta)
+		q.Enqueue(20)
+		q.Enqueue(30)
+		if got := q.SizeAlt(); got != 3 {
+			t.Errorf("3 elementos: SizeAlt esperado 3, obtido %d", got)
+		}
+
+		// 4. Forçar o Wrap-Around (Head e Tail dão a volta)
+		if _, err := q.Dequeue(); err != nil { // remove 10 (head vai para 1)
+			t.Fatalf("Erro inesperado no Dequeue 1: %v", err)
+		}
+		if _, err := q.Dequeue(); err != nil { // remove 20 (head vai para 2)
+			t.Fatalf("Erro inesperado no Dequeue 2: %v", err)
+		}
+
+		// Neste momento tem 1 elemento [30]. Vamos adicionar mais 3.
+		q.Enqueue(40)
+		q.Enqueue(50)
+		q.Enqueue(60)
+		// A fila tem 4 elementos [30, 40, 50, 60].
+		// O tail deu a volta e deve estar num índice menor que o head!
+
+		if got := q.SizeAlt(); got != 4 {
+			t.Errorf("Wrap around: SizeAlt esperado 4, obtido %d", got)
+		}
+	})
 }

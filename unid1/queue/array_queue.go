@@ -72,3 +72,7 @@ func (q *ArrayQueue) IsEmpty() bool {
 func (q *ArrayQueue) Size() int {
 	return q.size
 }
+
+func (q *ArrayQueue) SizeAlt() int {
+	return (q.tail - q.head + len(q.arr)) % len(q.arr)
+}
