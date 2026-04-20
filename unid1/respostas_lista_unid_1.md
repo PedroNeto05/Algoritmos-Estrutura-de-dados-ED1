@@ -78,8 +78,8 @@ Pois em cada operacao que alterasse o final da lista, teria que se atualizar sem
 
 implementacao nos arquivos:
 
-- array_stack.go
-- linked_stack.go
+- array_stack.go (x)
+- linked_stack.go (x)
 
 ### Questão 2
 
