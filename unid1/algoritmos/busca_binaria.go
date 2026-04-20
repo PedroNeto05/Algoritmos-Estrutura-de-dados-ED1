@@ -3,7 +3,7 @@ package algoritmos
 func BuscaBinaria(arr []int, val, ini, fim int) int {
 	meio := (fim + ini) / 2
 
-	if ini < fim {
+	if ini <= fim {
 		if arr[meio] == val {
 			return meio
 		} else if arr[meio] > val {
