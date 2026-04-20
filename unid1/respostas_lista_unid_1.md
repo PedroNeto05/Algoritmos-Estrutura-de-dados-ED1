@@ -95,7 +95,7 @@ implementacao nos arquivos:
 
 implementacao nos arquivos:
 
-- detect_parenteses.go
+- detect_parenteses.go (x)
 
 ### Questão 4
 
@@ -112,7 +112,7 @@ C)
 
 implementacao nos arquivos:
 
-- array_queue.go
+- array_queue.go (x)
 - linked_queue.go (x)
 
 ### Questão 3
