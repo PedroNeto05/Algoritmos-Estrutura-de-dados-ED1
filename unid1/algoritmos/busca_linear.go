@@ -1,4 +1,4 @@
-package algoritmosbusca
+package algoritmos
 
 func BuscaLinear(val int, arr []int) int {
 	for i, v := range arr {

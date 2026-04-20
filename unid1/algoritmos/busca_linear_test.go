@@ -1,4 +1,4 @@
-package algoritmosbusca
+package algoritmos
 
 import "testing"
 

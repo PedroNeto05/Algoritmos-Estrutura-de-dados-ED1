@@ -1,4 +1,4 @@
-package algoritmosbusca
+package algoritmos
 
 func BuscaBinaria(arr []int, val, ini, fim int) int {
 	meio := (fim + ini) / 2
