@@ -26,7 +26,7 @@ implementacao no arquivos:
 
 - array_list.go (x)
 - linked_list.go (x) revisar
-- doubly_linked_list.go
+- doubly_linked_list.go (x)
 
 ### Questão 2
 
@@ -162,3 +162,33 @@ implementacao no arquivos:
 ## Algoritmo de Busca
 
 ### Questão 1
+
+O Algoritmo de busca binaria sempre opera na metade do espaco de busca atual, ja o de busca linear sempre opera no espaco de busca total, o Algoritmo de busca binaria so é aplicavel quando temos dados ordenados de alguma forma, ja o de busca linear sempre é aplicavel
+
+### Questão 2
+
+A complexidade do Algoritmo de busca binaria é O(log(N))
+
+### Questão 3
+
+implementacao no arquivos:
+
+- busca_binaria.go
+
+### Questão 4
+
+implementacao no arquivos:
+
+- rev_busca_binaria.go
+
+### Questão 5
+
+Nem sempre faz sentido, somente se a lista permitir acesso aleatorio como arrays, se a lista tiver sido implementada usando ponteiros, nao faz sentido, pois teria que sempre percorrer grande parte da lista a cada nova iteracao
+
+### Questão 6
+
+B)
+
+### Questão 7
+
+A)
