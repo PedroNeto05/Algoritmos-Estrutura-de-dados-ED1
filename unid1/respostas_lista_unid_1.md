@@ -22,7 +22,7 @@ A)
 
 ### Questão 1
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - array_list.go (x)
 - linked_list.go (x)
@@ -52,19 +52,19 @@ Desvantagem - Na lista duplamente ligada tempos mais espaço alocado, pois tempo
 
 ### Questão 5
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - array_list.go (x)
 
 ### Questão 6
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - linked_list.go (x)
 
 ### Questão 7
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - doubly_linked_list.go (x)
 
@@ -76,7 +76,7 @@ Pois em cada operacao que alterasse o final da lista, teria que se atualizar sem
 
 ### Questão 1
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - array_stack.go
 - linked_stack.go
@@ -93,7 +93,7 @@ implementacao no arquivos:
 
 ### Questão 3
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - detect_parenteses.go
 
@@ -110,10 +110,10 @@ C)
 
 ### Questão 2
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - array_queue.go
-- linked_queue.go
+- linked_queue.go (x)
 
 ### Questão 3
 
@@ -127,7 +127,7 @@ implementacao no arquivos:
 
 ### Questão 4
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - size_func_queue.go
 
@@ -140,7 +140,7 @@ implementacao no arquivos:
 
 ### Questão 2
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - array_deque.go
 - linked_deque.go
@@ -171,13 +171,13 @@ A complexidade do Algoritmo de busca binaria é O(log(N))
 
 ### Questão 3
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - busca_binaria.go
 
 ### Questão 4
 
-implementacao no arquivos:
+implementacao nos arquivos:
 
 - rev_busca_binaria.go
 
