@@ -25,7 +25,7 @@ A)
 implementacao no arquivos:
 
 - array_list.go (x)
-- linked_list.go (x) revisar
+- linked_list.go (x)
 - doubly_linked_list.go (x)
 
 ### Questão 2
@@ -54,19 +54,19 @@ Desvantagem - Na lista duplamente ligada tempos mais espaço alocado, pois tempo
 
 implementacao no arquivos:
 
-- reverse_array_list.go (x)
+- array_list.go (x)
 
 ### Questão 6
 
 implementacao no arquivos:
 
-- reverse_linked_list.go
+- linked_list.go (x)
 
 ### Questão 7
 
 implementacao no arquivos:
 
-- reverse_doubly_linked_list.go
+- doubly_linked_list.go (x)
 
 ### Questão 8
 

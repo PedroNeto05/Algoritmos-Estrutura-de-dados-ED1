@@ -303,4 +303,125 @@ func TestDoublyLinkedListImplementation(t *testing.T) {
 			t.Errorf("O next do tail deve ser nil")
 		}
 	})
+	t.Run("Reverse Even Number of Elements", func(t *testing.T) {
+		l := newDoublyLinkedList(t)
+		l.Add(1)
+		l.Add(2)
+		l.Add(3)
+		l.Add(4)
+
+		l.Reverse()
+
+		expected := []int{4, 3, 2, 1}
+		for i, exp := range expected {
+			val, _ := l.Get(i)
+			if val != exp {
+				t.Errorf("Índice %d: esperado %d, obtido %d", i, exp, val)
+			}
+		}
+	})
+
+	t.Run("Reverse Odd Number of Elements", func(t *testing.T) {
+		l := newDoublyLinkedList(t)
+		l.Add(10)
+		l.Add(20)
+		l.Add(30)
+
+		l.Reverse()
+
+		expected := []int{30, 20, 10}
+		for i, exp := range expected {
+			val, _ := l.Get(i)
+			if val != exp {
+				t.Errorf("Índice %d: esperado %d, obtido %d", i, exp, val)
+			}
+		}
+	})
+
+	t.Run("Reverse Single Element", func(t *testing.T) {
+		l := newDoublyLinkedList(t)
+		l.Add(42)
+
+		l.Reverse()
+
+		val, _ := l.Get(0)
+		if val != 42 {
+			t.Errorf("Esperado 42, obtido %d", val)
+		}
+
+		if l.head != l.tail || l.head.val != 42 {
+			t.Errorf("Head e Tail deveriam apontar para o 42. Head: %v, Tail: %v", l.head, l.tail)
+		}
+	})
+
+	t.Run("Reverse Empty List", func(t *testing.T) {
+		l := newDoublyLinkedList(t)
+
+		l.Reverse() // Não deve causar panic
+
+		if l.Size() != 0 {
+			t.Errorf("Tamanho deveria continuar 0, obtido %d", l.Size())
+		}
+		if l.head != nil || l.tail != nil {
+			t.Errorf("Head e Tail deveriam continuar nil")
+		}
+	})
+
+	t.Run("Reverse Head and Tail Integrity", func(t *testing.T) {
+		l := newDoublyLinkedList(t)
+		l.Add(100)
+		l.Add(200)
+		l.Add(300)
+
+		l.Reverse()
+
+		if l.head == nil || l.head.val != 300 {
+			t.Fatalf("Novo head deveria ser 300, obtido %v", l.head)
+		}
+		if l.tail == nil || l.tail.val != 100 {
+			t.Fatalf("Novo tail deveria ser 100, obtido %v", l.tail)
+		}
+		if l.head.prev != nil {
+			t.Errorf("O prev do novo head deveria ser nil")
+		}
+		if l.tail.next != nil {
+			t.Errorf("O next do novo tail deveria ser nil")
+		}
+	})
+
+	t.Run("Reverse Bidirectional Traversal", func(t *testing.T) {
+		l := newDoublyLinkedList(t)
+		l.Add(10)
+		l.Add(20)
+		l.Add(30)
+		l.Add(40)
+
+		l.Reverse()
+
+		// Travessia Forward (usando next a partir do head)
+		curr := l.head
+		expectedForward := []int{40, 30, 20, 10}
+		for i, exp := range expectedForward {
+			if curr == nil {
+				t.Fatalf("Travessia forward parou prematuramente na iteração %d", i)
+			}
+			if curr.val != exp {
+				t.Errorf("Forward: esperado %d, obtido %d", exp, curr.val)
+			}
+			curr = curr.next
+		}
+
+		// Travessia Backward (usando prev a partir do tail)
+		curr = l.tail
+		expectedBackward := []int{10, 20, 30, 40}
+		for i, exp := range expectedBackward {
+			if curr == nil {
+				t.Fatalf("Travessia backward parou prematuramente na iteração %d", i)
+			}
+			if curr.val != exp {
+				t.Errorf("Backward: esperado %d, obtido %d", exp, curr.val)
+			}
+			curr = curr.prev
+		}
+	})
 }

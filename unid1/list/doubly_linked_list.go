@@ -1,6 +1,8 @@
 package list
 
-import "errors"
+import (
+	"errors"
+)
 
 type Nodes struct {
 	val  int
@@ -138,4 +140,16 @@ func (l *DoublyLinkedList) RemoveOnIndex(index int) error {
 
 func (l *DoublyLinkedList) Size() int {
 	return l.inserted
+}
+
+func (l *DoublyLinkedList) Reverse() {
+	curr := l.head
+
+	for curr != nil {
+		next := curr.next
+		curr.next, curr.prev = curr.prev, curr.next
+		curr = next
+	}
+
+	l.head, l.tail = l.tail, l.head
 }
