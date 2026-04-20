@@ -54,7 +54,7 @@ Desvantagem - Na lista duplamente ligada tempos mais espaço alocado, pois tempo
 
 implementacao no arquivos:
 
-- reverse_array_list.go
+- reverse_array_list.go (x)
 
 ### Questão 6
 
