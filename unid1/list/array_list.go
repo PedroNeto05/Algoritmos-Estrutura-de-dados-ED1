@@ -96,3 +96,10 @@ func (l *ArrayList) RemoveOnIndex(index int) error {
 func (l *ArrayList) Size() int {
 	return l.inserted
 }
+
+func (l *ArrayList) Reverse() {
+	limit := l.inserted / 2
+	for i := range limit {
+		l.arr[i], l.arr[l.inserted-1-i] = l.arr[l.inserted-1-i], l.arr[i]
+	}
+}

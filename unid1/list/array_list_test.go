@@ -253,4 +253,82 @@ func TestArrayListImplementation(t *testing.T) {
 			}
 		}
 	})
+	t.Run("Reverse Even Number of Elements", func(t *testing.T) {
+		l := newArrayList(t, 4)
+		l.Add(1)
+		l.Add(2)
+		l.Add(3)
+		l.Add(4)
+
+		l.Reverse()
+
+		expected := []int{4, 3, 2, 1}
+		for i, exp := range expected {
+			val, _ := l.Get(i)
+			if val != exp {
+				t.Errorf("Índice %d: esperado %d, obtido %d", i, exp, val)
+			}
+		}
+	})
+
+	t.Run("Reverse Odd Number of Elements", func(t *testing.T) {
+		l := newArrayList(t, 3)
+		l.Add(10)
+		l.Add(20)
+		l.Add(30)
+
+		l.Reverse()
+
+		expected := []int{30, 20, 10}
+		for i, exp := range expected {
+			val, _ := l.Get(i)
+			if val != exp {
+				t.Errorf("Índice %d: esperado %d, obtido %d", i, exp, val)
+			}
+		}
+	})
+
+	t.Run("Reverse Single Element", func(t *testing.T) {
+		l := newArrayList(t, 2)
+		l.Add(42)
+
+		l.Reverse()
+
+		val, _ := l.Get(0)
+		if val != 42 {
+			t.Errorf("Esperado 42, obtido %d", val)
+		}
+	})
+
+	t.Run("Reverse Empty List", func(t *testing.T) {
+		l := newArrayList(t, 5)
+
+		// Não deve causar panic
+		l.Reverse()
+
+		if l.Size() != 0 {
+			t.Errorf("Tamanho deveria continuar 0, obtido %d", l.Size())
+		}
+	})
+
+	t.Run("Reverse Partially Full List (The Trap)", func(t *testing.T) {
+		// Array com capacidade para 10, mas só vamos colocar 3 elementos
+		l := newArrayList(t, 10)
+		l.Add(1)
+		l.Add(2)
+		l.Add(3)
+
+		l.Reverse()
+
+		expected := []int{3, 2, 1}
+		for i, exp := range expected {
+			val, err := l.Get(i)
+			if err != nil {
+				t.Fatalf("Erro inesperado no Get(%d): %v", i, err)
+			}
+			if val != exp {
+				t.Errorf("Índice %d: esperado %d, obtido %d", i, exp, val)
+			}
+		}
+	})
 }
