@@ -1,15 +1,31 @@
 package algoritmos
 
-func BuscaBinariaRecursiva(arr []int, val, ini, fim int) int {
+func BuscaBinariaRecursivaAsc(arr []int, val, ini, fim int) int {
 	meio := (fim + ini) / 2
 
 	if ini <= fim {
 		if arr[meio] == val {
 			return meio
 		} else if arr[meio] > val {
-			return BuscaBinariaRecursiva(arr, val, ini, meio-1)
+			return BuscaBinariaRecursivaAsc(arr, val, ini, meio-1)
 		} else {
-			return BuscaBinariaRecursiva(arr, val, meio+1, fim)
+			return BuscaBinariaRecursivaAsc(arr, val, meio+1, fim)
+		}
+	}
+
+	return -1
+}
+
+func BuscaBinariaRecursivaDesc(arr []int, val, ini, fim int) int {
+	meio := (fim + ini) / 2
+
+	if ini <= fim {
+		if arr[meio] == val {
+			return meio
+		} else if arr[meio] < val {
+			return BuscaBinariaRecursivaDesc(arr, val, ini, meio-1)
+		} else {
+			return BuscaBinariaRecursivaDesc(arr, val, meio+1, fim)
 		}
 	}
 
