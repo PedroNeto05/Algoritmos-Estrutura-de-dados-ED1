@@ -129,7 +129,7 @@ implementacao nos arquivos:
 
 implementacao nos arquivos:
 
-- size_func_queue.go
+- size_func_queue.go (x)
 
 ## Deque
 
@@ -173,13 +173,13 @@ A complexidade do Algoritmo de busca binaria é O(log(N))
 
 implementacao nos arquivos:
 
-- busca_binaria.go
+- busca_binaria.go (x)
 
 ### Questão 4
 
 implementacao nos arquivos:
 
-- rev_busca_binaria.go
+- rev_busca_binaria.go (x)
 
 ### Questão 5
 
