@@ -127,3 +127,21 @@ func (l *LinkedList) RemoveOnIndex(index int) error {
 func (l *LinkedList) Size() int {
 	return l.inserted
 }
+
+func (l *LinkedList) Reverse() {
+	var prev *Node = nil
+
+	curr := l.head
+
+	var next *Node = nil
+
+	for curr != nil {
+		next = curr.next
+
+		curr.next = prev
+
+		prev = curr
+		curr = next
+	}
+	l.head = prev
+}

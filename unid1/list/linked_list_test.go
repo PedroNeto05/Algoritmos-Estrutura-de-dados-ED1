@@ -248,4 +248,62 @@ func TestLinkedListImplementation(t *testing.T) {
 			}
 		}
 	})
+
+	t.Run("Reverse Even Number of Elements", func(t *testing.T) {
+		l := newLinkedList(t)
+		l.Add(1)
+		l.Add(2)
+		l.Add(3)
+		l.Add(4)
+
+		l.Reverse()
+
+		expected := []int{4, 3, 2, 1}
+		for i, exp := range expected {
+			val, _ := l.Get(i)
+			if val != exp {
+				t.Errorf("Índice %d: esperado %d, obtido %d", i, exp, val)
+			}
+		}
+	})
+
+	t.Run("Reverse Odd Number of Elements", func(t *testing.T) {
+		l := newLinkedList(t)
+		l.Add(10)
+		l.Add(20)
+		l.Add(30)
+
+		l.Reverse()
+
+		expected := []int{30, 20, 10}
+		for i, exp := range expected {
+			val, _ := l.Get(i)
+			if val != exp {
+				t.Errorf("Índice %d: esperado %d, obtido %d", i, exp, val)
+			}
+		}
+	})
+
+	t.Run("Reverse Single Element", func(t *testing.T) {
+		l := newLinkedList(t)
+		l.Add(42)
+
+		l.Reverse()
+
+		val, _ := l.Get(0)
+		if val != 42 {
+			t.Errorf("Esperado 42, obtido %d", val)
+		}
+	})
+
+	t.Run("Reverse Empty List", func(t *testing.T) {
+		l := newLinkedList(t)
+
+		// Não deve causar panic
+		l.Reverse()
+
+		if l.Size() != 0 {
+			t.Errorf("Tamanho deveria continuar 0, obtido %d", l.Size())
+		}
+	})
 }
