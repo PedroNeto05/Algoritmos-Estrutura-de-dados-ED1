@@ -31,3 +31,45 @@ func BuscaBinariaRecursivaDesc(arr []int, val, ini, fim int) int {
 
 	return -1
 }
+
+func BuscaBinariaIterativaAsc(arr []int, val int) int {
+	ini := 0
+	fim := len(arr) - 1
+
+	for ini <= fim {
+		meio := (fim + ini) / 2
+
+		if arr[meio] == val {
+			return meio
+		}
+
+		if arr[meio] > val {
+			fim = meio - 1
+		} else {
+			ini = meio + 1
+		}
+	}
+
+	return -1
+}
+
+func BuscaBinariaIterativaDesc(arr []int, val int) int {
+	ini := 0
+	fim := len(arr) - 1
+
+	for ini <= fim {
+		meio := (fim + ini) / 2
+
+		if arr[meio] == val {
+			return meio
+		}
+
+		if arr[meio] < val {
+			fim = meio - 1
+		} else {
+			ini = meio + 1
+		}
+	}
+
+	return -1
+}
