@@ -142,8 +142,8 @@ implementacao nos arquivos:
 
 implementacao nos arquivos:
 
-- array_deque.go
-- linked_deque.go
+- array_deque.go (x)
+- linked_deque.go (x)
 
 ### Questão 3
 
