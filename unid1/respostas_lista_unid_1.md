@@ -8,7 +8,7 @@ Uma TAD seria o nome da estrutura e um conjunto de operacoes pre definidas mas s
 
 ### Questão 2
 
-A)
+B)
 
 ### Questão 3
 
@@ -48,7 +48,7 @@ Desvantagem - Na maioria do tempo tera espaço alocado sem uso
 ### Questão 4
 
 Vantagem - Acesso O(1) nas extremidades
-Desvantagem - Na lista duplamente ligada tempos mais espaço alocado, pois tempos que em um mesmo elemento sera guardado 2 ponteiros, o do anterior e o do proximo
+Desvantagem - Na lista duplamente ligada temos mais espaço alocado, pois temos que em um mesmo elemento sera guardado 2 ponteiros, o do anterior e o do proximo
 
 ### Questão 5
 
