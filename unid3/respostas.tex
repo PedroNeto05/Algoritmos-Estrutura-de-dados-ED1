@@ -513,7 +513,71 @@ tabela quando necessário, é o que preserva o desempenho médio $O(1)$.
 
 \subsection*{6) Código das funções da questão 3}
 Implementado em \texttt{hash/hashtable.go} (métodos \texttt{Put}, \texttt{Get}, \texttt{Remove},
-\texttt{Contains}, \texttt{Size}, \texttt{IsEmpty}, além da função interna \texttt{hash}).
+\texttt{Contains}, \texttt{Size}, \texttt{IsEmpty}, além da função interna \texttt{hash}):
+\begin{lstlisting}
+// hash mapeia uma chave (string) para um indice do array.
+func (h *HashTable) hash(key string) int {
+    sum := 0
+    for _, c := range key {
+        sum = sum*31 + int(c)
+    }
+    if sum < 0 {
+        sum = -sum
+    }
+    return sum % len(h.buckets)
+}
+
+// Put insere um novo par ou atualiza o valor de uma chave existente.
+func (h *HashTable) Put(key string, value int) {
+    idx := h.hash(key)
+    for e := h.buckets[idx]; e != nil; e = e.next {
+        if e.key == key {
+            e.value = value // chave ja existe: atualiza
+            return
+        }
+    }
+    h.buckets[idx] = &entry{key: key, value: value, next: h.buckets[idx]}
+    h.size++
+}
+
+// Get retorna o valor associado a chave e se foi encontrada.
+func (h *HashTable) Get(key string) (int, bool) {
+    idx := h.hash(key)
+    for e := h.buckets[idx]; e != nil; e = e.next {
+        if e.key == key {
+            return e.value, true
+        }
+    }
+    return 0, false
+}
+
+// Remove remove a chave; retorna true se ela existia.
+func (h *HashTable) Remove(key string) bool {
+    idx := h.hash(key)
+    var prev *entry
+    for e := h.buckets[idx]; e != nil; e = e.next {
+        if e.key == key {
+            if prev == nil {
+                h.buckets[idx] = e.next
+            } else {
+                prev.next = e.next
+            }
+            h.size--
+            return true
+        }
+        prev = e
+    }
+    return false
+}
+
+func (h *HashTable) Contains(key string) bool {
+    _, ok := h.Get(key)
+    return ok
+}
+
+func (h *HashTable) Size() int     { return h.size }
+func (h *HashTable) IsEmpty() bool { return h.size == 0 }
+\end{lstlisting}
 
 \newpage
 \section*{Filas de Prioridade (Heaps Binários)}
@@ -564,7 +628,102 @@ type BinaryHeap struct {
 
 \subsection*{5) Código das funções da questão anterior}
 Implementado em \texttt{heap/heap.go} (métodos \texttt{Add}, \texttt{Peek}, \texttt{Poll},
-\texttt{Remove}, \texttt{Size}, \texttt{IsEmpty}, e os auxiliares \texttt{siftUp}/\texttt{siftDown}).
+\texttt{Remove}, \texttt{Size}, \texttt{IsEmpty}, e os auxiliares \texttt{siftUp}/\texttt{siftDown}):
+\begin{lstlisting}
+// higherPriority: em min-heap a < b; em max-heap a > b.
+func (h *BinaryHeap) higherPriority(a, b int) bool {
+    if h.isMax {
+        return a > b
+    }
+    return a < b
+}
+
+func (h *BinaryHeap) swap(i, j int) {
+    h.data[i], h.data[j] = h.data[j], h.data[i]
+}
+
+// siftUp sobe o elemento i enquanto tiver prioridade maior que o pai.
+func (h *BinaryHeap) siftUp(i int) {
+    for i > 0 {
+        parent := (i - 1) / 2
+        if h.higherPriority(h.data[i], h.data[parent]) {
+            h.swap(i, parent)
+            i = parent
+        } else {
+            break
+        }
+    }
+}
+
+// siftDown desce o elemento i restaurando a propriedade de heap.
+func (h *BinaryHeap) siftDown(i int) {
+    n := len(h.data)
+    for {
+        left, right, best := 2*i+1, 2*i+2, i
+        if left < n && h.higherPriority(h.data[left], h.data[best]) {
+            best = left
+        }
+        if right < n && h.higherPriority(h.data[right], h.data[best]) {
+            best = right
+        }
+        if best == i {
+            break
+        }
+        h.swap(i, best)
+        i = best
+    }
+}
+
+func (h *BinaryHeap) Add(value int) {
+    h.data = append(h.data, value)
+    h.siftUp(len(h.data) - 1)
+}
+
+func (h *BinaryHeap) Peek() (int, bool) {
+    if len(h.data) == 0 {
+        return 0, false
+    }
+    return h.data[0], true
+}
+
+func (h *BinaryHeap) Poll() (int, bool) {
+    if len(h.data) == 0 {
+        return 0, false
+    }
+    top := h.data[0]
+    last := len(h.data) - 1
+    h.data[0] = h.data[last]
+    h.data = h.data[:last]
+    if len(h.data) > 0 {
+        h.siftDown(0)
+    }
+    return top, true
+}
+
+func (h *BinaryHeap) Remove(value int) bool {
+    idx := -1
+    for i, v := range h.data {
+        if v == value {
+            idx = i
+            break
+        }
+    }
+    if idx == -1 {
+        return false
+    }
+    last := len(h.data) - 1
+    h.data[idx] = h.data[last]
+    h.data = h.data[:last]
+    if idx < len(h.data) {
+        h.siftDown(idx)
+        h.siftUp(idx)
+    }
+    return true
+}
+
+func (h *BinaryHeap) Size() int     { return len(h.data) }
+func (h *BinaryHeap) IsEmpty() bool { return len(h.data) == 0 }
+\end{lstlisting}
 
 \subsection*{6) Heap de Mínimo com os 10 primeiros caracteres do nome}
 Os 10 primeiros caracteres de \textbf{Pedro Nascimento} são:
