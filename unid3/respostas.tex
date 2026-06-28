@@ -1,0 +1,629 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{kw}{rgb}{0.0,0.0,0.6}
+\definecolor{cmt}{rgb}{0.0,0.5,0.0}
+\definecolor{str}{rgb}{0.6,0.0,0.0}
+
+\lstdefinelanguage{GoLang}{
+  keywords={break,default,func,interface,select,case,defer,go,map,struct,
+    chan,else,goto,package,switch,const,fallthrough,if,range,type,continue,
+    for,import,return,var,nil,true,false,bool,int,string},
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+}
+
+\lstdefinestyle{go}{
+  language=GoLang,
+  backgroundcolor=\color{codegray},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{kw}\bfseries,
+  commentstyle=\color{cmt}\itshape,
+  stringstyle=\color{str},
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  tabsize=4,
+}
+\lstset{style=go}
+
+\title{Lista de Exercícios --- Unidade 3\\\large AVL, Tabelas de Dispersão e Filas de Prioridade}
+\author{Pedro Nascimento --- Algoritmos e Estruturas de Dados I (EDI)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Observação:} as questões de \emph{implementação} foram entregues em arquivos Go:
+\begin{itemize}[noitemsep]
+  \item \texttt{avl/avl.go} --- toda a AVL (questões 5, 8, 10, 11, 13, 15, 16, 18, 20);
+  \item \texttt{hash/hashtable.go} --- Tabela de Dispersão / TAD Map (questões 3, 4, 6);
+  \item \texttt{heap/heap.go} --- Heap Binária / PriorityQueue (questões 3, 4, 5).
+\end{itemize}
+Este documento contém as questões \emph{escritas} e as ilustrações. Em toda a unidade
+adota-se a convenção do material do professor:
+\[
+  bf = \text{altura(subárvore direita)} - \text{altura(subárvore esquerda)},
+\]
+de modo que $bf<0$ indica árvore pesada à \textbf{esquerda} e $bf>0$ pesada à \textbf{direita}.
+A altura de uma folha é $0$ e a de uma subárvore vazia é $-1$.
+
+\section*{AVL}
+
+\subsection*{1) O que é fator de balanceamento e como é calculado?}
+É um valor associado a cada nó que mede o quão desequilibrada está a árvore naquele ponto.
+Calcula-se como a diferença entre as alturas das subárvores filhas:
+\[
+  bf(n) = \text{altura}(n.\text{direita}) - \text{altura}(n.\text{esquerda}).
+\]
+Numa árvore AVL, $bf(n) \in \{-1, 0, +1\}$ para todo nó $n$. Se $|bf| \ge 2$, o nó está
+desbalanceado e precisa ser rebalanceado.
+
+\subsection*{2) O que diferencia uma árvore AVL de uma BST?}
+Uma AVL \emph{é} uma BST (mantém a propriedade de ordenação: menores à esquerda, maiores
+à direita), porém com uma restrição adicional de balanceamento: para todo nó, $|bf|\le 1$.
+Após cada inserção ou remoção a AVL se reequilibra através de rotações, garantindo que a
+altura permaneça $O(\log n)$. Uma BST comum não tem essa garantia e pode degenerar.
+
+\subsection*{3) Desempenho de BSTs e AVLs}
+As operações de busca, inserção e remoção em ambas custam $O(h)$, onde $h$ é a altura.
+\begin{itemize}[noitemsep]
+  \item \textbf{BST:} no caso médio (inserções aleatórias) $h \approx \log n$, logo
+        $O(\log n)$. No pior caso (dados já ordenados) a árvore vira uma "lista",
+        $h = n-1$, e as operações ficam $O(n)$.
+  \item \textbf{AVL:} o balanceamento garante $h = O(\log n)$ \emph{sempre}, então todas as
+        operações são $O(\log n)$ no pior caso. O custo extra é manter altura/$bf$ e
+        eventualmente realizar rotações, ambos $O(1)$ por nó no caminho.
+\end{itemize}
+Resumindo: a AVL troca um pequeno custo constante por nó pela garantia de desempenho
+logarítmico no pior caso.
+
+\subsection*{4) Resultado da rotação do nó D para a direita}
+Antes (D é a raiz, B seu filho esquerdo com filhos A e C, E seu filho direito):
+\begin{Verbatim}
+        D                         B
+       / \      RotRight(D)      / \
+      B   E     ----------->    A   D
+     / \                           / \
+    A   C                         C   E
+\end{Verbatim}
+O filho esquerdo (B) sobe e vira raiz; D desce e passa a ser o filho direito de B;
+a antiga subárvore direita de B (o nó C) passa a ser a subárvore esquerda de D.
+
+\subsection*{5) Código que rotaciona à direita}
+Implementado em \texttt{avl/avl.go} (método \texttt{RotRight}). Versão básica pedida na questão:
+\begin{lstlisting}
+func (root *BstNode) RotRight() *BstNode {
+    newRoot := root.left
+    root.left = newRoot.right
+    newRoot.right = root
+    return newRoot
+}
+\end{lstlisting}
+
+\subsection*{6) Por que é fundamental retornar um \texttt{*BstNode}?}
+Porque a rotação \emph{muda qual nó é a raiz} daquela subárvore. Como os nós são ligados por
+ponteiros e o pai aponta para o filho via atribuição (\texttt{pai.left = filho.RotRight()}),
+a função precisa devolver o novo nó-raiz para que o pai atualize seu ponteiro. Sem o retorno,
+o pai continuaria apontando para o antigo topo da subárvore, corrompendo a estrutura.
+
+\subsection*{7) Resultado da rotação do nó B para a esquerda}
+Antes (B é a raiz, A seu filho esquerdo, D seu filho direito com filhos C e E):
+\begin{Verbatim}
+      B                          D
+     / \       RotLeft(B)       / \
+    A   D       --------->     B   E
+       / \                    / \
+      C   E                  A   C
+\end{Verbatim}
+O filho direito (D) sobe e vira raiz; B desce e vira filho esquerdo de D; a antiga subárvore
+esquerda de D (o nó C) passa a ser a subárvore direita de B.
+
+\subsection*{8) Código que rotaciona à esquerda}
+Implementado em \texttt{avl/avl.go} (método \texttt{RotLeft}). Versão básica:
+\begin{lstlisting}
+func (root *BstNode) RotLeft() *BstNode {
+    newRoot := root.right
+    root.right = newRoot.left
+    newRoot.left = root
+    return newRoot
+}
+\end{lstlisting}
+
+\subsection*{9) Quais nós atualizar e em qual ordem (questões 4 e 7)}
+Após uma rotação, apenas os \emph{dois} nós envolvidos têm suas alturas/$bf$ alterados, e a
+ordem importa: deve-se atualizar primeiro o nó que \textbf{desceu} (a antiga raiz) e só depois
+o nó que \textbf{subiu} (a nova raiz), pois a altura/$bf$ de quem sobe é calculada a partir
+dos filhos --- que incluem o nó que acabou de descer.
+\begin{itemize}[noitemsep]
+  \item \textbf{Questão 4} (\texttt{RotRight} em D): atualizar primeiro \textbf{D}, depois \textbf{B}.
+  \item \textbf{Questão 7} (\texttt{RotLeft} em B): atualizar primeiro \textbf{B}, depois \textbf{D}.
+\end{itemize}
+
+\subsection*{10) Função que atualiza as propriedades de um nó}
+Implementado em \texttt{avl/avl.go} (método \texttt{UpdateProperties}):
+\begin{lstlisting}
+func (root *BstNode) UpdateProperties() *BstNode {
+    lh := height(root.left)   // -1 se nil
+    rh := height(root.right)
+    if lh > rh {
+        root.height = lh + 1
+    } else {
+        root.height = rh + 1
+    }
+    root.bf = rh - lh
+    return root
+}
+\end{lstlisting}
+
+\subsection*{11) \texttt{RotRight} e \texttt{RotLeft} com \texttt{UpdateProperties}}
+Implementado em \texttt{avl/avl.go}. As rotações já chamam \texttt{UpdateProperties} na ordem
+descrita na questão 9 (antiga raiz e depois nova raiz):
+\begin{lstlisting}
+func (root *BstNode) RotRight() *BstNode {
+    newRoot := root.left
+    root.left = newRoot.right
+    newRoot.right = root
+    root.UpdateProperties()    // antiga raiz (desceu)
+    newRoot.UpdateProperties() // nova raiz
+    return newRoot
+}
+
+func (root *BstNode) RotLeft() *BstNode {
+    newRoot := root.right
+    root.right = newRoot.left
+    newRoot.left = root
+    root.UpdateProperties()
+    newRoot.UpdateProperties()
+    return newRoot
+}
+\end{lstlisting}
+
+\subsection*{12) Os 6 casos de desbalanceamento}
+Em cada ilustração o nó desbalanceado tem $|bf| = 2$. Os casos \emph{neutro} surgem
+tipicamente após remoções.
+
+\paragraph{esquerda-esquerda} (raiz $bf=-2$, filho esquerdo $bf=-1$) --- exemplo do enunciado:
+\begin{Verbatim}
+              F  h=3, bf=-2
+             / \
+   h=2,bf=-1 D   G  h=0, bf=0
+            / \
+  h=1,bf=0 B   E  h=0, bf=0
+          / \
+h=0,bf=0 A   C  h=0, bf=0
+\end{Verbatim}
+
+\paragraph{esquerda-neutro} (raiz $bf=-2$, filho esquerdo $bf=0$):
+\begin{Verbatim}
+        C  h=2, bf=-2
+       /
+      A  h=1, bf=0
+     / \
+    x   y   (h=0, bf=0)
+\end{Verbatim}
+
+\paragraph{esquerda-direita} (raiz $bf=-2$, filho esquerdo $bf=+1$):
+\begin{Verbatim}
+        C  h=2, bf=-2
+       /
+      A  h=1, bf=+1
+       \
+        B  h=0, bf=0
+\end{Verbatim}
+
+\paragraph{direita-direita} (raiz $bf=+2$, filho direito $bf=+1$):
+\begin{Verbatim}
+    A  h=2, bf=+2
+     \
+      C  h=1, bf=+1
+       \
+        E  h=0, bf=0
+\end{Verbatim}
+
+\paragraph{direita-neutro} (raiz $bf=+2$, filho direito $bf=0$):
+\begin{Verbatim}
+    A  h=2, bf=+2
+     \
+      C  h=1, bf=0
+     / \
+    x   y   (h=0, bf=0)
+\end{Verbatim}
+
+\paragraph{direita-esquerda} (raiz $bf=+2$, filho direito $bf=-1$):
+\begin{Verbatim}
+    A  h=2, bf=+2
+     \
+      C  h=1, bf=-1
+     /
+    B  h=0, bf=0
+\end{Verbatim}
+
+\subsection*{13) Ações para balancear cada caso (descrição)}
+As funções correspondentes estão em \texttt{avl/avl.go}.
+\begin{itemize}[noitemsep]
+  \item \textbf{esquerda-esquerda:} rotação simples à direita no nó desbalanceado
+        (\texttt{RotRight}).
+  \item \textbf{esquerda-neutro:} rotação simples à direita (\texttt{RotRight}).
+  \item \textbf{esquerda-direita:} rotação dupla --- primeiro \texttt{RotLeft} no filho
+        esquerdo, depois \texttt{RotRight} no nó desbalanceado.
+  \item \textbf{direita-direita:} rotação simples à esquerda (\texttt{RotLeft}).
+  \item \textbf{direita-neutro:} rotação simples à esquerda (\texttt{RotLeft}).
+  \item \textbf{direita-esquerda:} rotação dupla --- primeiro \texttt{RotRight} no filho
+        direito, depois \texttt{RotLeft} no nó desbalanceado.
+\end{itemize}
+\begin{lstlisting}
+func (root *BstNode) RebalanceLeftLeft() *BstNode  { return root.RotRight() }
+func (root *BstNode) RebalanceLeftNeutral() *BstNode { return root.RotRight() }
+func (root *BstNode) RebalanceLeftRight() *BstNode {
+    root.left = root.left.RotLeft()
+    return root.RotRight()
+}
+func (root *BstNode) RebalanceRightRight() *BstNode { return root.RotLeft() }
+func (root *BstNode) RebalanceRightNeutral() *BstNode { return root.RotLeft() }
+func (root *BstNode) RebalanceRightLeft() *BstNode {
+    root.right = root.right.RotRight()
+    return root.RotLeft()
+}
+\end{lstlisting}
+
+\subsection*{14) Por que retornar um \texttt{*BstNode} nessas funções?}
+Pelo mesmo motivo da questão 6: o rebalanceamento envolve rotações que trocam a raiz da
+subárvore. A função devolve o novo topo para que o chamador (o pai, ou a própria \texttt{Rebalance})
+religue o ponteiro corretamente.
+
+\subsection*{15) Função que rebalanceia uma AVL}
+Implementado em \texttt{avl/avl.go} (método \texttt{Rebalance}), reusando as funções da
+questão 13 e a classificação dos casos da questão 12:
+\begin{lstlisting}
+func (root *BstNode) Rebalance() *BstNode {
+    root.UpdateProperties()
+    if root.bf < -1 { // pesada a esquerda
+        if root.left.bf < 0 {
+            return root.RebalanceLeftLeft()
+        } else if root.left.bf > 0 {
+            return root.RebalanceLeftRight()
+        }
+        return root.RebalanceLeftNeutral()
+    }
+    if root.bf > 1 { // pesada a direita
+        if root.right.bf > 0 {
+            return root.RebalanceRightRight()
+        } else if root.right.bf < 0 {
+            return root.RebalanceRightLeft()
+        }
+        return root.RebalanceRightNeutral()
+    }
+    return root
+}
+\end{lstlisting}
+
+\subsection*{16) Adição em AVL}
+Implementado em \texttt{avl/avl.go} (método \texttt{Add}). A diferença para a BST é que, ao
+retornar pela recursão, cada nó religa o filho ao resultado de \texttt{Add} e chama
+\texttt{Rebalance}, devolvendo a nova raiz da subárvore:
+\begin{lstlisting}
+func (root *BstNode) Add(value int) *BstNode {
+    if value <= root.value {
+        if root.left == nil {
+            root.left = NewNode(value)
+        } else {
+            root.left = root.left.Add(value)
+        }
+    } else {
+        if root.right == nil {
+            root.right = NewNode(value)
+        } else {
+            root.right = root.right.Add(value)
+        }
+    }
+    return root.Rebalance()
+}
+\end{lstlisting}
+
+\subsection*{17) Por que retornar um \texttt{*BstNode} no \texttt{Add}?}
+Porque a inserção pode disparar um rebalanceamento (rotação) que altera a raiz da subárvore.
+Retornando o novo topo, a linha \texttt{root.left = root.left.Add(value)} religa o pai ao nó
+correto após o possível ajuste. É também o que permite tratar de forma uniforme a criação do
+primeiro nó e o reequilíbrio.
+
+\subsection*{18) Remoção em AVL}
+Implementado em \texttt{avl/avl.go} (método \texttt{Remove}). Igual à remoção da BST, mas com
+\texttt{Rebalance} no retorno de cada nível:
+\begin{lstlisting}
+func (root *BstNode) Remove(value int) *BstNode {
+    if root == nil {
+        return nil
+    }
+    if value < root.value {
+        root.left = root.left.Remove(value)
+    } else if value > root.value {
+        root.right = root.right.Remove(value)
+    } else {
+        if root.left == nil && root.right == nil {
+            return nil
+        } else if root.left != nil && root.right == nil {
+            return root.left
+        } else if root.left == nil && root.right != nil {
+            return root.right
+        } else {
+            maxEsq := root.left.Max()
+            root.value = maxEsq
+            root.left = root.left.Remove(maxEsq)
+        }
+    }
+    return root.Rebalance()
+}
+\end{lstlisting}
+
+\subsection*{19) Por que retornar um \texttt{*BstNode} no \texttt{Remove}?}
+Mesma razão: a remoção pode mudar a raiz da subárvore --- tanto pelos casos de 0/1 filho
+(em que se retorna \texttt{nil} ou o único filho) quanto pelo rebalanceamento por rotações.
+O retorno permite ao pai religar seu ponteiro ao nó correto.
+
+\subsection*{20) Função que identifica se uma árvore é AVL}
+Implementado em \texttt{avl/avl.go} (método \texttt{IsAVL}):
+\begin{lstlisting}
+func (root *BstNode) IsAVL() bool {
+    if root == nil {
+        return true
+    }
+    bf := realHeight(root.right) - realHeight(root.left)
+    if bf < -1 || bf > 1 {
+        return false
+    }
+    return root.left.IsAVL() && root.right.IsAVL()
+}
+\end{lstlisting}
+
+\subsection*{21) Inserindo os caracteres do nome (sem repetição)}
+Nome: \textbf{Pedro Nascimento}. Caracteres únicos, na ordem de aparição:
+\[
+  \texttt{P,\ E,\ D,\ R,\ O,\ N,\ A,\ S,\ C,\ I,\ M,\ T}
+\]
+Inserindo um a um numa AVL (comparação alfabética), ocorrem as seguintes operações de
+rebalanceamento:
+\begin{itemize}[noitemsep]
+  \item Ao inserir \textbf{D} (sequência P,E,D): a raiz P fica $bf=-2$ e E $bf=-1$ ---
+        caso \emph{esquerda-esquerda}: \texttt{RotRight} em P. Raiz passa a ser E.
+  \item Ao inserir \textbf{N}: E fica $bf=+2$ com o filho direito P em $bf=-1$ ---
+        caso \emph{direita-esquerda}: \texttt{RotRight} em P seguido de \texttt{RotLeft} em E.
+        Raiz passa a ser O.
+  \item Ao inserir \textbf{S}: o nó P fica $bf=+2$ com filho direito R $bf=+1$ ---
+        caso \emph{direita-direita}: \texttt{RotLeft} em P.
+  \item Ao inserir \textbf{C}: o nó D fica $bf=-2$ com filho esquerdo A $bf=+1$ ---
+        caso \emph{esquerda-direita}: \texttt{RotLeft} em A seguido de \texttt{RotRight} em D.
+  \item Ao inserir \textbf{M}: o nó N fica $bf=-2$ com filho esquerdo I $bf=+1$ ---
+        caso \emph{esquerda-direita}: \texttt{RotLeft} em I seguido de \texttt{RotRight} em N.
+  \item Ao inserir \textbf{I} e \textbf{T}: nenhum rebalanceamento é necessário.
+\end{itemize}
+Árvore AVL final (verificada com o código de \texttt{avl/avl.go}):
+\begin{Verbatim}
+                 O
+              /     \
+            E         R
+           / \       / \
+          C   M     P   S
+         / \ / \         \
+        A  D I  N         T
+\end{Verbatim}
+
+\subsection*{22) Inserção do valor 3 (questão de múltipla escolha)}
+Árvore inicial:
+\begin{Verbatim}
+        13
+       /  \
+      10   15
+     /  \    \
+    5   11   16
+   / \
+  4   8
+\end{Verbatim}
+Inserindo 3, ele desce até virar filho esquerdo de 4. Isso deixa o nó \textbf{10} desbalanceado
+($bf=-2$, com o filho esquerdo 5 em $bf=-1$): caso \emph{esquerda-esquerda}, resolvido por
+\texttt{RotRight} em 10. O nó 5 sobe ao lugar de 10 (o filho direito de 5, que era 8, passa a
+ser filho esquerdo de 10). A árvore resultante é:
+\begin{Verbatim}
+        13
+       /  \
+      5    15
+     / \     \
+    4   10   16
+   /   /  \
+  3   8   11
+\end{Verbatim}
+\textbf{Resposta: alternativa A.} (A alternativa B corresponde à inserção \emph{sem}
+rebalanceamento, que deixaria a árvore inválida.)
+
+\newpage
+\section*{Tabelas de Dispersão}
+
+\subsection*{1) Qual é a estrutura de dados básica?}
+Um \textbf{array (vetor)}. Cada posição do array é um \emph{bucket}/\emph{slot}, e o índice de
+cada elemento é obtido aplicando-se a função de hash sobre a chave. O acesso direto por índice
+no array é o que dá o tempo médio $O(1)$ às operações.
+
+\subsection*{2) Como elementos de diferentes tipos são mapeados para a tabela?}
+Através de uma \textbf{função de hash}, que converte a chave --- de qualquer tipo --- em um
+número inteiro (\emph{hash code}). Sobre esse inteiro aplica-se o operador módulo pelo tamanho
+do array para obter um índice válido: \texttt{indice = hash(chave) \% tamanho}. A função deve
+ser \emph{determinística} (mesma chave $\rightarrow$ mesmo índice) e distribuir as chaves o mais
+uniformemente possível. Tipos diferentes (inteiros, strings, objetos) usam estratégias próprias
+de hashing: inteiros podem usar o próprio valor; strings combinam os códigos dos caracteres
+(ex.: função polinomial base 31, usada em \texttt{hash/hashtable.go}).
+
+\subsection*{3) Funções fundamentais do TAD \texttt{Map}}
+Implementado em \texttt{hash/hashtable.go}:
+\begin{lstlisting}
+type Map interface {
+    Put(key string, value int) // insere/atualiza um par chave-valor
+    Get(key string) (int, bool) // valor e se a chave existe
+    Remove(key string) bool     // remove; true se existia
+    Contains(key string) bool   // true se a chave esta presente
+    Size() int                  // quantidade de pares
+    IsEmpty() bool
+}
+\end{lstlisting}
+
+\subsection*{4) Estrutura de dado \texttt{HashTable}}
+Implementado em \texttt{hash/hashtable.go} (encadeamento separado):
+\begin{lstlisting}
+type entry struct {     // no da lista ligada de um bucket
+    key   string
+    value int
+    next  *entry
+}
+type HashTable struct {
+    buckets []*entry    // array de buckets
+    size    int         // numero de pares armazenados
+}
+\end{lstlisting}
+
+\subsection*{5) O que são colisões e como endereçá-las?}
+Uma \textbf{colisão} ocorre quando duas chaves \emph{distintas} produzem o \emph{mesmo} índice na
+tabela (algo inevitável, pois o espaço de chaves costuma ser maior que o de índices). Principais
+formas de tratamento:
+\begin{itemize}[noitemsep]
+  \item \textbf{Encadeamento separado (separate chaining):} cada bucket guarda uma lista ligada
+        (ou outra estrutura) com todas as entradas que caíram naquele índice. É a abordagem
+        usada na implementação.
+  \item \textbf{Endereçamento aberto (open addressing):} todas as entradas ficam no próprio
+        array; em caso de colisão procura-se outro slot livre por uma sequência de sondagem:
+        \begin{itemize}[noitemsep]
+          \item \emph{sondagem linear} --- tenta $i+1, i+2, \dots$;
+          \item \emph{sondagem quadrática} --- tenta $i+1^2, i+2^2, \dots$;
+          \item \emph{hash duplo} --- usa uma segunda função de hash para o passo.
+        \end{itemize}
+\end{itemize}
+Em qualquer caso, manter o \emph{fator de carga} (elementos/tamanho) baixo, redimensionando a
+tabela quando necessário, é o que preserva o desempenho médio $O(1)$.
+
+\subsection*{6) Código das funções da questão 3}
+Implementado em \texttt{hash/hashtable.go} (métodos \texttt{Put}, \texttt{Get}, \texttt{Remove},
+\texttt{Contains}, \texttt{Size}, \texttt{IsEmpty}, além da função interna \texttt{hash}).
+
+\newpage
+\section*{Filas de Prioridade (Heaps Binários)}
+
+\subsection*{1) O que é uma Fila de Prioridade e o que é uma Heap? Aplicações}
+Uma \textbf{Fila de Prioridade} é um TAD parecido com uma fila, mas em que cada elemento tem uma
+\emph{prioridade}; a remoção (\emph{poll}) sempre retorna o elemento de maior prioridade, e não
+o que entrou primeiro (não é FIFO). Uma \textbf{Heap (binária)} é a estrutura de dados mais usada
+para implementá-la: é uma \emph{árvore binária completa} (preenchida da esquerda para a direita)
+que satisfaz a \emph{propriedade de heap} --- todo pai tem prioridade maior ou igual à dos
+filhos. Costuma ser armazenada em um array, onde, para o índice $i$, os filhos estão em $2i+1$ e
+$2i+2$ e o pai em $\lfloor (i-1)/2 \rfloor$.
+\par\noindent\textbf{Aplicações:} algoritmo de Dijkstra (caminho mínimo) e Prim (árvore geradora
+mínima), codificação de Huffman, \emph{heapsort}, escalonamento de processos por prioridade,
+simulação de eventos discretos e seleção dos $k$ maiores/menores elementos.
+
+\subsection*{2) Diferença entre Heap de mínimo e Heap de máximo}
+\begin{itemize}[noitemsep]
+  \item \textbf{Heap de mínimo (min-heap):} todo pai é $\le$ seus filhos; a raiz é o
+        \emph{menor} elemento. \texttt{Poll} retorna o menor.
+  \item \textbf{Heap de máximo (max-heap):} todo pai é $\ge$ seus filhos; a raiz é o
+        \emph{maior} elemento. \texttt{Poll} retorna o maior.
+\end{itemize}
+A única diferença prática é o sentido da comparação usada para subir/descer elementos --- na
+implementação, o método \texttt{higherPriority} encapsula isso através do campo \texttt{isMax}.
+
+\subsection*{3) Funções fundamentais do tipo \texttt{PriorityQueue}}
+Implementado em \texttt{heap/heap.go}:
+\begin{lstlisting}
+type PQ interface {
+    Add(value int)         // insere um elemento
+    Peek() (int, bool)     // consulta o de maior prioridade
+    Poll() (int, bool)     // remove e retorna o de maior prioridade
+    Remove(value int) bool // remove uma ocorrencia de um valor
+    Size() int
+    IsEmpty() bool
+}
+\end{lstlisting}
+
+\subsection*{4) Estrutura de dado \texttt{BinaryHeap}}
+Implementado em \texttt{heap/heap.go}:
+\begin{lstlisting}
+type BinaryHeap struct {
+    data  []int // heap armazenada em array
+    isMax bool  // false = min-heap, true = max-heap
+}
+\end{lstlisting}
+
+\subsection*{5) Código das funções da questão anterior}
+Implementado em \texttt{heap/heap.go} (métodos \texttt{Add}, \texttt{Peek}, \texttt{Poll},
+\texttt{Remove}, \texttt{Size}, \texttt{IsEmpty}, e os auxiliares \texttt{siftUp}/\texttt{siftDown}).
+
+\subsection*{6) Heap de Mínimo com os 10 primeiros caracteres do nome}
+Os 10 primeiros caracteres de \textbf{Pedro Nascimento} são:
+\[
+  \texttt{P,\ E,\ D,\ R,\ O,\ N,\ A,\ S,\ C,\ I}
+\]
+Inserindo-os nessa ordem numa min-heap (menor letra = maior prioridade), obtém-se o array
+(verificado com \texttt{heap/heap.go}):
+\[
+  [\,A,\,C,\,D,\,O,\,I,\,N,\,E,\,S,\,R,\,P\,]
+\]
+que corresponde à árvore:
+\begin{Verbatim}
+              A
+           /     \
+          C       D
+         / \     / \
+        O   I   N   E
+       / \  /
+      S  R P
+\end{Verbatim}
+\textbf{Operações (cada uma aplicada à heap acima):}
+\begin{itemize}[noitemsep]
+  \item \textbf{Adicionar A:} A entra no fim e sobe até quase a raiz (empata com o A da raiz, que
+        permanece). Resultado: $[A,A,D,O,C,N,E,S,R,P,I]$.
+  \item \textbf{Adicionar Z:} Z é o maior, então fica como folha no fim, sem subir.
+        Resultado: $[A,C,D,O,I,N,E,S,R,P,Z]$.
+  \item \textbf{Poll:} remove a raiz $A$ (menor). O último elemento sobe para a raiz e desce
+        reorganizando. Resultado: $[C,I,D,O,P,N,E,S,R]$ (removido: \texttt{A}).
+  \item \textbf{Remover P} (primeira letra do nome): P estava na última posição; é removido
+        diretamente. Resultado: $[A,C,D,O,I,N,E,S,R]$.
+\end{itemize}
+
+\subsection*{7) Heap de Máximo com os 10 primeiros caracteres do nome}
+Mesmos caracteres \texttt{P,E,D,R,O,N,A,S,C,I}, agora numa max-heap (maior letra = maior
+prioridade). Array resultante (verificado com \texttt{heap/heap.go}):
+\[
+  [\,S,\,R,\,N,\,P,\,O,\,D,\,A,\,E,\,C,\,I\,]
+\]
+correspondente à árvore:
+\begin{Verbatim}
+              S
+           /     \
+          R       N
+         / \     / \
+        P   O   D   A
+       / \  /
+      E  C I
+\end{Verbatim}
+\textbf{Operações (cada uma aplicada à heap acima):}
+\begin{itemize}[noitemsep]
+  \item \textbf{Adicionar A:} A é pequeno, fica como folha no fim sem subir.
+        Resultado: $[S,R,N,P,O,D,A,E,C,I,A]$.
+  \item \textbf{Adicionar Z:} Z é o maior de todos, sobe desde a folha até virar a raiz.
+        Resultado: $[Z,S,N,P,R,D,A,E,C,I,O]$.
+  \item \textbf{Poll:} remove a raiz $S$ (maior). O último elemento sobe e desce reorganizando.
+        Resultado: $[R,P,N,I,O,D,A,E,C]$ (removido: \texttt{S}).
+  \item \textbf{Remover P} (primeira letra do nome): troca-se P pelo último elemento ($I$) e
+        ajusta-se. Resultado: $[S,R,N,I,O,D,A,E,C]$.
+\end{itemize}
+
+\end{document}
